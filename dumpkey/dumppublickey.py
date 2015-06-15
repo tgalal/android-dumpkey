@@ -15,6 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 #!/usr/bin/python
+import os
+import M2Crypto as m2
+import sys
+unistr = str if sys.version_info >= (3, 0) else unicode
 def gcd(a, b):
     # Return the GCD of a and b using Euclid's Algorithm
     while a != 0:
@@ -58,8 +62,15 @@ def check(pubkey):
 
 def print_rsa(pubkey):
     """
-    :param pubkey: EVP_PKEY
+    :param pubkey: EVP_PKEY | str
     """
+
+    if type(pubkey) is unistr:
+        if not os.path.exists(pubkey):
+            raise Exception("%s does not exist" % pubkey)
+        tcs = m2.X509.load_cert(pubkey)
+        pubkey = tcs.get_pubkey()
+
     check(pubkey)
 
     N = int(pubkey.get_modulus(), 16)
