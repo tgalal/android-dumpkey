@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-#!/usr/bin/python
 import os
 import M2Crypto as m2
 import sys
