@@ -2,9 +2,9 @@ deps = ['M2Crypto']
 from setuptools import setup, find_packages
 import dumpkey
 setup(
-    name='android_dumpkey',
+    name='android-dumpkey',
     version=dumpkey.__version__,
-    url='http://github.com/tgalal/android_dumpkey/',
+    url='http://github.com/tgalal/android-dumpkey/',
     license='Apache License, Version 2.0',
     author='Tarek Galal',
     tests_require=[],
