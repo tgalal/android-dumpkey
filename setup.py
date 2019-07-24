@@ -1,4 +1,4 @@
-deps = ['M2Crypto']
+deps = ['cryptography']
 from setuptools import setup, find_packages
 import dumpkey
 setup(

@@ -15,8 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 import os
-import M2Crypto as m2
 import sys
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 unistr = str if sys.version_info >= (3, 0) else unicode
 def gcd(a, b):
     # Return the GCD of a and b using Euclid's Algorithm
@@ -48,12 +49,13 @@ def check(pubkey):
     """
     :param pubkey:  EVP_PKEY
     """
-    rsa = pubkey.get_rsa()
+    rsa = pubkey.public_numbers()
     pubexp = rsa.e
-    modulus = int(pubkey.get_modulus(), 16)
-    expect = "\x00\x00\x00\x01\x03"
-    if pubexp != expect:
-        raise Exception("Public exponent should be %s but is %s " % (expect, pubexp ))
+    # modulus = int(rsa.n, 16)
+    modulus = rsa.n
+    expect = (3, 65537)
+    if pubexp not in expect:
+        raise Exception("Public exponent should be in %s but is %s " % (expect, pubexp ))
 
     if modulus.bit_length() != 2048:
         raise Exception("Modulus should be 2048 bits long but is %s bits" % modulus.bit_length())
@@ -67,12 +69,13 @@ def print_rsa(pubkey):
     if type(pubkey) is unistr:
         if not os.path.exists(pubkey):
             raise Exception("%s does not exist" % pubkey)
-        tcs = m2.X509.load_cert(pubkey)
-        pubkey = tcs.get_pubkey()
+        with open(pubkey, 'rb') as pubkeyfile:
+            tcs = x509.load_pem_x509_certificate(pubkeyfile.read(), default_backend())
+        pubkey = tcs.public_key()
 
     check(pubkey)
 
-    N = int(pubkey.get_modulus(), 16)
+    N = pubkey.public_numbers().n
     result = ""
 
     nwords = N.bit_length() / 32 # of 32 bit integers in modulus
