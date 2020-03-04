@@ -21,7 +21,7 @@ import traceback
 from dumpkey import dumppublickey
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        sys.stderr.write("Usage: DumpPublicKey certfile ... > source.c")
+        sys.stderr.write("Usage: DumpPublicKey certfile ... > source.c\n")
         sys.exit(1)
     try:
         out = []
