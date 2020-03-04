@@ -18,6 +18,7 @@ import os
 import sys
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 unistr = str if sys.version_info >= (3, 0) else unicode
 def gcd(a, b):
     # Return the GCD of a and b using Euclid's Algorithm
@@ -69,10 +70,18 @@ def print_rsa(pubkey):
     if type(pubkey) is unistr:
         if not os.path.exists(pubkey):
             raise Exception("%s does not exist" % pubkey)
-        with open(pubkey, 'rb') as pubkeyfile:
-            tcs = x509.load_pem_x509_certificate(pubkeyfile.read(), default_backend())
-        pubkey = tcs.public_key()
-
+        try:
+            with open(pubkey, 'rb') as pubkeyfile:
+                tcs = x509.load_pem_x509_certificate(pubkeyfile.read(), default_backend())
+            pubkey = tcs.public_key()
+        except ValueError as cert_err:
+            # It may be just a public key
+            try:
+                with open(pubkey, 'rb') as pubkeyfile:
+                    pubkey = load_pem_public_key(pubkeyfile.read(), default_backend())
+            except ValueError as key_error:
+                raise Exception('%s is not parseable as a certificate or public key' % pubkey)
+        
     check(pubkey)
 
     N = pubkey.public_numbers().n
